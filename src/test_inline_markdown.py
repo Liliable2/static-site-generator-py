@@ -4,6 +4,8 @@ from inline_markdown import (
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_delimiter,
+    split_nodes_image,
+    split_nodes_link,
 )
 from textnode import TextNode, TextType
 
@@ -56,6 +58,49 @@ class TestSplitNode(unittest.TestCase):
         node = TextNode("This is `invalid markdown", TextType.TEXT)
         with self.assertRaises(ValueError):
             split_nodes_delimiter([node], "`", TextType.CODE)
+
+    def test_split_image(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zcew34n.png) and another ![second](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zcew34n.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_links(self):
+        node = TextNode(
+            "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://www.example.com"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("another", TextType.LINK, "https://www.example.com/another"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_links_at_start(self):
+        node = TextNode("[link](https://boot.dev) is at the start", TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+                TextNode(" is at the start", TextType.TEXT),
+            ],
+            new_nodes,
+        )
 
 
 class TestMarkdownExtraction(unittest.TestCase):
