@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 from htmlnode import ParentNode, text_node_to_html_node
@@ -156,3 +157,45 @@ def olist_to_html_node(block):
         children = text_to_children(text)
         html_items.append(ParentNode("li", children))
     return ParentNode("ol", html_items)
+
+
+def extract_title(markdown):
+    """extract h1 header from markdown and return the title text"""
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line[2:].strip()
+    raise Exception("no h1 header found")
+
+
+def generate_page(from_path, template_path, dest_path):
+    """generate html page from markdown using template"""
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+
+    # read markdown file
+    with open(from_path, "r") as f:
+        markdown = f.read()
+
+    # read template file
+    with open(template_path, "r") as f:
+        template = f.read()
+
+    # convert markdown to html
+    html_node = markdown_to_html_node(markdown)
+    html_content = html_node.to_html()
+
+    # extract title
+    title = extract_title(markdown)
+
+    # replace placeholders in template
+    page = template.replace("{{ Title }}", title)
+    page = page.replace("{{ Content }}", html_content)
+
+    # create directories if needed
+    dest_dir = os.path.dirname(dest_path)
+    if dest_dir:
+        os.makedirs(dest_dir, exist_ok=True)
+
+    # write the final html page
+    with open(dest_path, "w") as f:
+        f.write(page)

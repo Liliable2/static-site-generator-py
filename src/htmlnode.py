@@ -33,7 +33,7 @@ class LeafNode(HTMLNode):
 
     def to_html(self):
         """render leaf node as HTML string"""
-        if not self.value:
+        if self.value is None:
             raise ValueError
 
         if not self.tag:

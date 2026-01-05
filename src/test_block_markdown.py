@@ -3,6 +3,7 @@ import unittest
 from block_markdown import (
     BlockType,
     block_to_block_type,
+    extract_title,
     markdown_to_blocks,
     markdown_to_html_node,
 )
@@ -261,6 +262,40 @@ code here
             html,
             "<div><h1>Welcome</h1><p>This is a <b>paragraph</b>.</p><ul><li>Item 1</li><li>Item 2</li></ul><pre><code>code here</code></pre></div>",
         )
+
+
+class TestExtractTitle(unittest.TestCase):
+    def test_extract_title_simple(self):
+        md = "# Hello"
+        self.assertEqual(extract_title(md), "Hello")
+
+    def test_extract_title_with_whitespace(self):
+        md = "#   Hello World   "
+        self.assertEqual(extract_title(md), "Hello World")
+
+    def test_extract_title_in_document(self):
+        md = """Some text before
+
+# My Title
+
+Some text after"""
+        self.assertEqual(extract_title(md), "My Title")
+
+    def test_extract_title_not_h2(self):
+        md = "## This is h2 not h1"
+        with self.assertRaises(Exception):
+            extract_title(md)
+
+    def test_extract_title_no_header(self):
+        md = "Just some text without any header"
+        with self.assertRaises(Exception):
+            extract_title(md)
+
+    def test_extract_title_first_h1(self):
+        md = """# First Title
+
+# Second Title"""
+        self.assertEqual(extract_title(md), "First Title")
 
 
 if __name__ == "__main__":
