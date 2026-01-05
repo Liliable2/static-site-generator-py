@@ -15,6 +15,7 @@ class BlockType(Enum):
 
 
 def markdown_to_blocks(markdown):
+    """split markdown into blocks separated by blank lines"""
     blocks = markdown.split("\n\n")
     filtered_blocks = []
     for block in blocks:
@@ -25,6 +26,7 @@ def markdown_to_blocks(markdown):
 
 
 def block_to_block_type(block):
+    """determine the type of a markdown block"""
     lines = block.split("\n")
 
     # check for heading (1-6 # characters followed by space)
@@ -57,6 +59,7 @@ def block_to_block_type(block):
 
 
 def markdown_to_html_node(markdown):
+    """convert full markdown string to HTML node tree"""
     blocks = markdown_to_blocks(markdown)
     children = []
     for block in blocks:
@@ -66,6 +69,7 @@ def markdown_to_html_node(markdown):
 
 
 def block_to_html_node(block):
+    """convert a single block to appropriate HTML node"""
     block_type = block_to_block_type(block)
     if block_type == BlockType.PARAGRAPH:
         return paragraph_to_html_node(block)

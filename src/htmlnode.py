@@ -2,6 +2,8 @@ from textnode import TextType
 
 
 class HTMLNode:
+    """base class for HTML nodes with tag, value, children, and properties"""
+
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
         self.value = value
@@ -9,9 +11,11 @@ class HTMLNode:
         self.props = props
 
     def to_html(self):
+        """convert node to HTML string (must be implemented by subclasses)"""
         raise NotImplementedError
 
     def props_to_html(self):
+        """convert properties dict to HTML attribute string"""
         if not self.props:
             return ""
 
@@ -22,10 +26,13 @@ class HTMLNode:
 
 
 class LeafNode(HTMLNode):
+    """HTML node with no children, represents leaf elements like text or img"""
+
     def __init__(self, tag, value, props=None):
         super().__init__(tag=tag, value=value, props=props)
 
     def to_html(self):
+        """render leaf node as HTML string"""
         if not self.value:
             raise ValueError
 
@@ -36,10 +43,13 @@ class LeafNode(HTMLNode):
 
 
 class ParentNode(HTMLNode):
+    """HTML node with children, represents container elements like div, p, etc"""
+
     def __init__(self, tag, children, props=None):
         super().__init__(tag=tag, children=children, props=props)
 
     def to_html(self):
+        """render parent node and all children as HTML string"""
         if not self.tag:
             raise ValueError("ParentNode must have a tag")
 
@@ -52,6 +62,7 @@ class ParentNode(HTMLNode):
 
 
 def text_node_to_html_node(text_node):
+    """convert a text node to the appropriate HTML node based on text type"""
     match text_node.text_type:
         case TextType.TEXT:
             return LeafNode(None, text_node.text)

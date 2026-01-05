@@ -4,6 +4,7 @@ from textnode import TextNode, TextType
 
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    """split text nodes by delimiter and apply text type to delimited content"""
     new_nodes = []
     for node in old_nodes:
         if node.text_type != TextType.TEXT:
@@ -29,6 +30,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
 
 def split_nodes_image(old_nodes):
+    """extract image nodes from text and split into separate nodes"""
     new_nodes = []
     for node in old_nodes:
         if node.text_type != TextType.TEXT:
@@ -63,6 +65,7 @@ def split_nodes_image(old_nodes):
 
 
 def split_nodes_link(old_nodes):
+    """extract link nodes from text and split into separate nodes"""
     new_nodes = []
     for node in old_nodes:
         if node.text_type != TextType.TEXT:
@@ -97,14 +100,17 @@ def split_nodes_link(old_nodes):
 
 
 def extract_markdown_images(text):
+    """extract all image markdown patterns from text, returning tuples of (alt, src)"""
     return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
 
 
 def extract_markdown_links(text):
+    """extract all link markdown patterns from text, returning tuples of (text, url)"""
     return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
 
 
 def text_to_textnodes(text):
+    """parse text into a list of text nodes with proper formatting types"""
     nodes = [TextNode(text, TextType.TEXT)]
     nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
     nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
